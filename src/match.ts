@@ -1,6 +1,7 @@
 import { Team } from "./team";
 import { Stadium } from "./stadium";
 import { Referee } from "./referee";
+import { Player } from "./player";
 
 export type RawMatch = {
     id: string;
@@ -42,7 +43,25 @@ export type Match = {
     home_team: Team;
     away_team: Team;
     stadium: Stadium;
-    referee: Referee;
+    referee: Referee,
+    home_squad: Array<{
+        //player: Player,
+        first_name: string,
+        last_name: string,
+        number: string,
+        position: string,
+        starter: boolean,
+        substitute: boolean,
+    }>,
+    away_squad: Array<{
+        //player: Player,
+        first_name: string,
+        last_name: string,
+        number: string,
+        position: string,
+        starter: boolean,
+        substitute: boolean,
+    }>,
 };
 
 export const MATCH_QUERY = `SELECT 
@@ -76,7 +95,32 @@ export const MATCH_QUERY = `SELECT
     INNER JOIN referees ON referee_appearances.referee_id = referees.referee_id
     WHERE matches.key_id = ?`;
 
-export function matchTransformer(input: RawMatch): Match {
+export const MATCH_HOME_TEAM_QUERY = `SELECT 
+    home_team_appearances.shirt_number as number,
+    home_team_appearances.position_code as position,
+    home_team_appearances.starter as starter,
+    home_team_appearances.substitute as susbtitute,
+    home_team_players.given_name as first_name,
+    home_team_players.family_name as last_name
+    FROM matches 
+    INNER JOIN player_appearances home_team_appearances ON matches.match_id = home_team_appearances.match_id AND home_team_appearances.team_id = matches.home_team_id
+    INNER JOIN players home_team_players ON home_team_appearances.player_id = home_team_players.player_id
+    WHERE matches.key_id = ?`;
+
+export const MATCH_AWAY_TEAM_QUERY = `SELECT 
+    away_team_appearances.shirt_number as number,
+    away_team_appearances.position_code as position,
+    away_team_appearances.starter as starter,
+    away_team_appearances.substitute as susbtitute,
+    away_team_players.given_name as first_name,
+    away_team_players.family_name as last_name
+    FROM matches 
+    INNER JOIN player_appearances away_team_appearances ON matches.match_id = away_team_appearances.match_id AND  away_team_appearances.team_id = matches.away_team_id
+    INNER JOIN players away_team_players ON away_team_appearances.player_id = away_team_players.player_id
+    WHERE matches.key_id = ?`;
+
+export function matchTransformer(input: RawMatch, homeTeam: any, awayTeam: any): Match {
+    
     return {
         id: input.id,
         name: input.name,
@@ -106,6 +150,8 @@ export function matchTransformer(input: RawMatch): Match {
         referee: {
             name: `${input.referee_first_name} ${input.referee_last_name}`,
             country: input.referee_country,
-        }
+        },
+        home_squad: [homeTeam],
+        away_squad: [awayTeam],
     };
 }
