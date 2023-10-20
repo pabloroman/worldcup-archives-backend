@@ -1,8 +1,3 @@
-export type Team = {
-    name: string,
-    code: string,
-};
-
 export const TOURNAMENT_TEAMS_QUERY = `SELECT 
     teams.team_name as name,
     teams.team_code as code

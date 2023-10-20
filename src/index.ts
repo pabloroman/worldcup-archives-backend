@@ -4,7 +4,8 @@ import { cors } from 'hono/cors';
 import { ALL_TOURNAMENTS_QUERY, Tournament, tournamentTransformer } from './tournaments';
 import { TOURNAMENT_QUERY } from './tournament';
 import { TOURNAMENT_TEAMS_QUERY } from './tournamentTeams';
-import { TOURNAMENT_MATCHES_QUERY, Match, matchTransformer } from './tournamentMatches';
+import { TOURNAMENT_MATCHES_QUERY, Match, matchesTransformer } from './tournamentMatches';
+import { MATCH_QUERY, matchTransformer } from './match';
 
 const app = new Hono()
 
@@ -37,9 +38,17 @@ app.get('/api/tournament/:id/games', async ctx => {
   const { id } = ctx.req.param();
   const { results } = await ctx.env.DB.prepare(TOURNAMENT_MATCHES_QUERY).bind(id).all();
 
-  const group: Match[] = matchTransformer(results);
+  const group: Match[] = matchesTransformer(results);
 
   return ctx.json(group);
 })
 
+app.get('/api/game/:id', async ctx => {
+  const { id } = ctx.req.param();
+  const { results } = await ctx.env.DB.prepare(MATCH_QUERY).bind(id).all();
+
+  const group: Match = matchTransformer(results[0]);
+
+  return ctx.json(group);
+})
 export default app;

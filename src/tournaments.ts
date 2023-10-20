@@ -1,3 +1,5 @@
+import { Team } from "./team";
+
 export type RawTournament = {
     id: string;
     name: string;
@@ -11,11 +13,6 @@ export type RawTournament = {
     award_name: string;
     player_team_name: string;
     player_team_code: string;
-};
-
-export type Team = {
-    name: string,
-    code: string,
 };
 
 export type Tournament = {

@@ -1,3 +1,5 @@
+import { Team } from "./team";
+
 export type RawMatch = {
     id: string;
     name: string;
@@ -14,11 +16,6 @@ export type RawMatch = {
     home_team_name: string;
     away_team_code: string;
     away_team_name: string;
-};
-
-export type Team = {
-    name: string,
-    code: string,
 };
 
 export type Match = {
@@ -59,7 +56,7 @@ export const TOURNAMENT_MATCHES_QUERY = `SELECT
     WHERE matches.tournament_id = ?`;
 
 
-export function matchTransformer(input: RawMatch[]): Match[] {
+export function matchesTransformer(input: RawMatch[]): Match[] {
     const resultMap: { [key: string]: Match } = {};
 
     input.forEach(entry => {
