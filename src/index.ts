@@ -5,7 +5,7 @@ import { ALL_TOURNAMENTS_QUERY, Tournament, tournamentTransformer } from './tour
 import { TOURNAMENT_QUERY } from './tournament';
 import { TOURNAMENT_TEAMS_QUERY } from './tournamentTeams';
 import { TOURNAMENT_MATCHES_QUERY, Match, matchesTransformer } from './tournamentMatches';
-import { MATCH_AWAY_TEAM_QUERY, MATCH_HOME_TEAM_QUERY, MATCH_QUERY, matchTransformer } from './match';
+import { MATCH_AWAY_MANAGERS_QUERY, MATCH_AWAY_TEAM_QUERY, MATCH_HOME_MANAGERS_QUERY, MATCH_HOME_TEAM_QUERY, MATCH_QUERY, matchTransformer } from './match';
 
 const app = new Hono()
 
@@ -50,7 +50,10 @@ app.get('/api/game/:id', async ctx => {
   const { results: homeTeam } = await ctx.env.DB.prepare(MATCH_HOME_TEAM_QUERY).bind(id).all();
   const { results: awayTeam } = await ctx.env.DB.prepare(MATCH_AWAY_TEAM_QUERY).bind(id).all();
 
-  const group: Match = matchTransformer(match, homeTeam, awayTeam);
+  const { results: homeManagers } = await ctx.env.DB.prepare(MATCH_HOME_MANAGERS_QUERY).bind(id).all();
+  const { results: awayManagers } = await ctx.env.DB.prepare(MATCH_AWAY_MANAGERS_QUERY).bind(id).all();
+
+  const group: Match = matchTransformer(match, homeTeam, awayTeam, homeManagers, awayManagers);
 
   return ctx.json(group);
 })

@@ -2,6 +2,7 @@ import { Team } from "./team";
 import { Stadium } from "./stadium";
 import { Referee } from "./referee";
 import { Player } from "./player";
+import { Manager } from "./manager";
 
 export type RawMatch = {
     id: string;
@@ -62,6 +63,8 @@ export type Match = {
         starter: boolean,
         substitute: boolean,
     }>,
+    home_managers: Array<Manager>,
+    away_managers: Array<Manager>,
 };
 
 export const MATCH_QUERY = `SELECT 
@@ -119,7 +122,23 @@ export const MATCH_AWAY_TEAM_QUERY = `SELECT
     INNER JOIN players away_team_players ON away_team_appearances.player_id = away_team_players.player_id
     WHERE matches.key_id = ?`;
 
-export function matchTransformer(input: RawMatch, homeTeam: any, awayTeam: any): Match {
+export const MATCH_HOME_MANAGERS_QUERY = `SELECT 
+    managers.given_name || ' ' || managers.family_name as name,
+    managers.country_name as country
+    FROM matches 
+    INNER JOIN manager_appearances ON matches.match_id = manager_appearances.match_id AND matches.home_team_id = manager_appearances.team_id 
+    INNER JOIN managers ON manager_appearances.manager_id = managers.manager_id
+    WHERE matches.key_id = ?`;
+
+export const MATCH_AWAY_MANAGERS_QUERY = `SELECT 
+    managers.given_name || ' ' || managers.family_name as name,
+    managers.country_name as country
+    FROM matches 
+    INNER JOIN manager_appearances ON matches.match_id = manager_appearances.match_id AND matches.away_team_id = manager_appearances.team_id 
+    INNER JOIN managers ON manager_appearances.manager_id = managers.manager_id
+    WHERE matches.key_id = ?`;
+
+export function matchTransformer(input: RawMatch, homeTeam: any, awayTeam: any, homeManagers: Manager[], awayManagers: Manager[]): Match {
     
     return {
         id: input.id,
@@ -151,7 +170,9 @@ export function matchTransformer(input: RawMatch, homeTeam: any, awayTeam: any):
             name: `${input.referee_first_name} ${input.referee_last_name}`,
             country: input.referee_country,
         },
-        home_squad: [homeTeam],
-        away_squad: [awayTeam],
+        home_squad: homeTeam,
+        away_squad: awayTeam,
+        home_managers: homeManagers,
+        away_managers: awayManagers,
     };
 }
