@@ -22,9 +22,9 @@ app.get('/api/tournaments/:gender', async ctx => {
 
 app.get('/api/tournament/:id', async ctx => {
   const { id } = ctx.req.param();
-  const { results } = await ctx.env.DB.prepare(TOURNAMENT_QUERY).bind(id).all();
+  const tournament = await ctx.env.DB.prepare(TOURNAMENT_QUERY).bind(id).first();
 
-  return ctx.json(results[0]);
+  return ctx.json(tournament);
 })
 
 app.get('/api/tournament/:id/teams', async ctx => {
@@ -45,13 +45,14 @@ app.get('/api/tournament/:id/games', async ctx => {
 
 app.get('/api/game/:id', async ctx => {
   const { id } = ctx.req.param();
-  const { results } = await ctx.env.DB.prepare(MATCH_QUERY).bind(id).all();
+  const match = await ctx.env.DB.prepare(MATCH_QUERY).bind(id).first();
 
-  const { homeTeam } = await ctx.env.DB.prepare(MATCH_HOME_TEAM_QUERY).bind(id).all();
-  const { awayTeam } = await ctx.env.DB.prepare(MATCH_AWAY_TEAM_QUERY).bind(id).all();
+  const { results: homeTeam } = await ctx.env.DB.prepare(MATCH_HOME_TEAM_QUERY).bind(id).all();
+  const { results: awayTeam } = await ctx.env.DB.prepare(MATCH_AWAY_TEAM_QUERY).bind(id).all();
 
-  const group: Match = matchTransformer(results[0], homeTeam, awayTeam);
+  const group: Match = matchTransformer(match, homeTeam, awayTeam);
 
   return ctx.json(group);
 })
+
 export default app;
