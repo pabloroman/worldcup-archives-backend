@@ -7,13 +7,13 @@ const app = new Hono()
 
 app.use('/api/*', cors());
 
-app.get('/api/tournaments/:gender', async c => {
-  const { gender } = c.req.param();
-  const { results } = await c.env.DB.prepare(ALL_TOURNAMENTS_QUERY).bind(Number(gender == 'female')).all();
+app.get('/api/tournaments/:gender', async ctx => {
+  const { gender } = ctx.req.param();
+  const { results } = await ctx.env.DB.prepare(ALL_TOURNAMENTS_QUERY).bind(Number(gender == 'female')).all();
 
   const group: Tournament[] = tournamentTransformer(results);
 
-  return c.json(group);
+  return ctx.json(group);
 })
 
 export default app;
