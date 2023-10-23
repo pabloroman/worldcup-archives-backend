@@ -33,6 +33,7 @@ export type RawMatch = {
 export type Match = {
     id: string;
     name: string;
+    tournament_name: string,
     stage_name: string;
     match_date: string;
     match_time: string;
@@ -73,6 +74,7 @@ export const MATCH_QUERY = `SELECT
     matches.key_id as id,
     matches.match_name as name,
     matches.stage_name,
+    tournaments.tournament_name as tournament_name,
     matches.match_date,
     matches.match_time,
     matches.extra_time,
@@ -93,6 +95,7 @@ export const MATCH_QUERY = `SELECT
     referees.family_name as referee_last_name,
     referees.country_name as referee_country
     FROM matches 
+    INNER JOIN tournaments ON matches.tournament_id = tournaments.tournament_id
     INNER JOIN teams home_team ON matches.home_team_id = home_team.team_id
     INNER JOIN teams away_team ON matches.away_team_id = away_team.team_id
     INNER JOIN stadiums ON matches.stadium_id = stadiums.stadium_id
@@ -157,6 +160,7 @@ export function matchTransformer(input: RawMatch, homeTeam: any, awayTeam: any, 
     return {
         id: input.id,
         name: input.name,
+        tournament_name: input.tournament_name,
         stage_name: input.stage_name,
         match_date: input.match_date,
         match_time: input.match_time,
