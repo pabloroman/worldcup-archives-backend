@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors';
+import { cache } from 'hono/cache';
 
 import { ALL_TOURNAMENTS_QUERY, Tournament, tournamentTransformer } from './tournaments';
 import { TOURNAMENT_QUERY } from './tournament';
@@ -10,6 +11,11 @@ import { MATCH_AWAY_MANAGERS_QUERY, MATCH_AWAY_TEAM_QUERY, MATCH_GOALS_QUERY, MA
 const app = new Hono()
 
 app.use('/api/*', cors());
+
+app.get('/api/*', cache({
+  cacheName: 'worldcup-archives',
+  cacheControl: 'public,max-age=2592000' // 30 days
+}));
 
 app.get('/api/tournaments/:gender', async ctx => {
   const { gender } = ctx.req.param();
