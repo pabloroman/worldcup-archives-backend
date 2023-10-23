@@ -9,6 +9,7 @@ export type RawMatch = {
     id: string;
     name: string;
     stage_name: string;
+    tournament_name: string;
     match_date: string;
     match_time: string;
     home_team_score: number;

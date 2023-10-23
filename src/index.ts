@@ -7,6 +7,8 @@ import { TOURNAMENT_QUERY } from './tournament';
 import { TOURNAMENT_TEAMS_QUERY } from './tournamentTeams';
 import { TOURNAMENT_MATCHES_QUERY, Match, matchesTransformer } from './tournamentMatches';
 import { MATCH_AWAY_MANAGERS_QUERY, MATCH_AWAY_TEAM_QUERY, MATCH_GOALS_QUERY, MATCH_HOME_MANAGERS_QUERY, MATCH_HOME_TEAM_QUERY, MATCH_QUERY, matchTransformer } from './match';
+import { SQUAD_MANAGERS_TOURNAMENT_QUERY, SQUAD_PLAYERS_TOURNAMENT_QUERY, SQUAD_TOURNAMENT_QUERY, Squad, squadTransformer } from './team';
+import { TEAM_MATCHES_QUERY, teamMatchesTransformer } from './teamMatches';
 
 const app = new Hono()
 
@@ -38,6 +40,19 @@ app.get('/api/tournament/:id/teams', async ctx => {
   const { results } = await ctx.env.DB.prepare(TOURNAMENT_TEAMS_QUERY).bind(id).all();
 
   return ctx.json(results);
+})
+
+app.get('/api/tournament/:tournament/team/:team', async ctx => {
+  const { tournament, team } = ctx.req.param();
+  
+  const squad = await ctx.env.DB.prepare(SQUAD_TOURNAMENT_QUERY).bind(tournament, team).first();
+  const { results: players } = await ctx.env.DB.prepare(SQUAD_PLAYERS_TOURNAMENT_QUERY).bind(tournament, team).all();
+  const { results: managers } = await ctx.env.DB.prepare(SQUAD_MANAGERS_TOURNAMENT_QUERY).bind(tournament, team).all();
+  const { results: matches } = await ctx.env.DB.prepare(TEAM_MATCHES_QUERY).bind(tournament, team).all();
+
+  const group: Squad = squadTransformer(squad, players, managers, teamMatchesTransformer(matches));
+ 
+  return ctx.json(group);
 })
 
 app.get('/api/tournament/:id/games', async ctx => {
