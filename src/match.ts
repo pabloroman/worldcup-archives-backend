@@ -49,18 +49,14 @@ export type Match = {
     stadium: Stadium;
     referee: Referee,
     home_squad: Array<{
-        //player: Player,
-        first_name: string,
-        last_name: string,
+        player: Player,
         number: string,
         position: string,
         starter: boolean,
         substitute: boolean,
     }>,
     away_squad: Array<{
-        //player: Player,
-        first_name: string,
-        last_name: string,
+        player: Player,
         number: string,
         position: string,
         starter: boolean,
@@ -109,8 +105,7 @@ export const MATCH_HOME_TEAM_QUERY = `SELECT
     home_team_appearances.position_code as position,
     home_team_appearances.starter as starter,
     home_team_appearances.substitute as susbtitute,
-    home_team_players.given_name as first_name,
-    home_team_players.family_name as last_name
+    home_team_players.given_name || ' ' || home_team_players.family_name as player
     FROM matches 
     INNER JOIN player_appearances home_team_appearances ON matches.match_id = home_team_appearances.match_id AND home_team_appearances.team_id = matches.home_team_id
     INNER JOIN players home_team_players ON home_team_appearances.player_id = home_team_players.player_id
@@ -121,8 +116,7 @@ export const MATCH_AWAY_TEAM_QUERY = `SELECT
     away_team_appearances.position_code as position,
     away_team_appearances.starter as starter,
     away_team_appearances.substitute as susbtitute,
-    away_team_players.given_name as first_name,
-    away_team_players.family_name as last_name
+    away_team_players.given_name || ' ' || away_team_players.family_name as player
     FROM matches 
     INNER JOIN player_appearances away_team_appearances ON matches.match_id = away_team_appearances.match_id AND  away_team_appearances.team_id = matches.away_team_id
     INNER JOIN players away_team_players ON away_team_appearances.player_id = away_team_players.player_id

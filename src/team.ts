@@ -1,5 +1,4 @@
 import { Manager } from "./manager";
-import { Match } from "./match";
 import { Player } from "./player";
 import { MatchSummary } from "./teamMatches";
 
@@ -13,18 +12,19 @@ export type Squad = {
     performance: string,
     managers: Array<Manager>,
     matches: Array<MatchSummary>,
-    players: Array<{
-        player: Player,
-        number: string,
-        position: string,
-    }>;
+    players: Array<SquadMember>;
+}
+
+export type SquadMember = {
+    player: Player,
+    number: string,
+    position: string,
 }
 
 export const SQUAD_PLAYERS_TOURNAMENT_QUERY = `SELECT 
     squad_members.shirt_number,
     squad_members.position_code as position,
-    players.given_name as first_name,
-    players.family_name as last_name
+    players.given_name || ' ' || players.family_name as player
     FROM squad_members
     INNER JOIN teams ON teams.team_id = squad_members.team_id
     INNER JOIN players ON players.player_id = squad_members.player_id
@@ -49,7 +49,7 @@ export const SQUAD_MANAGERS_TOURNAMENT_QUERY = `SELECT
     WHERE manager_appointments.tournament_id = ?
     AND teams.team_code = ?`;
 
-export function squadTransformer(squad: any, players: any[], managers: Manager[], matches: MatchSummary[]): Squad {
+export function squadTransformer(squad: any, players: SquadMember[], managers: Manager[], matches: MatchSummary[]): Squad {
 
     return {
         country: {
