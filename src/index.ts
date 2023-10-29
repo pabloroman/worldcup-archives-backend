@@ -5,7 +5,7 @@ import { cache } from 'hono/cache';
 import { ALL_TOURNAMENTS_QUERY, SINGLE_TOURNAMENT_QUERY, Tournament, tournamentTransformer } from './tournaments';
 import { TOURNAMENT_TEAMS_QUERY } from './tournamentTeams';
 import { TOURNAMENT_MATCHES_QUERY, Match, matchesTransformer } from './tournamentMatches';
-import { MATCH_AWAY_MANAGERS_QUERY, MATCH_AWAY_TEAM_QUERY, MATCH_BOOKINGS_QUERY, MATCH_GOALS_QUERY, MATCH_HOME_MANAGERS_QUERY, MATCH_HOME_TEAM_QUERY, MATCH_QUERY, matchTransformer } from './match';
+import { MATCH_AWAY_MANAGERS_QUERY, MATCH_AWAY_TEAM_QUERY, MATCH_BOOKINGS_QUERY, MATCH_GOALS_QUERY, MATCH_HOME_MANAGERS_QUERY, MATCH_HOME_TEAM_QUERY, MATCH_QUERY, MATCH_SUBSTITUTIONS_QUERY, matchTransformer } from './match';
 import { SQUAD_MANAGERS_TOURNAMENT_QUERY, SQUAD_PLAYERS_TOURNAMENT_QUERY, SQUAD_TOURNAMENT_QUERY, Squad, squadTransformer } from './team';
 import { TEAM_MATCHES_QUERY, teamMatchesTransformer } from './teamMatches';
 
@@ -77,8 +77,9 @@ app.get('/api/game/:id', async ctx => {
 
   const { results: goals } = await ctx.env.DB.prepare(MATCH_GOALS_QUERY).bind(id).all();
   const { results: bookings } = await ctx.env.DB.prepare(MATCH_BOOKINGS_QUERY).bind(id).all();
+  const { results: substitutions } = await ctx.env.DB.prepare(MATCH_SUBSTITUTIONS_QUERY).bind(id).all();
 
-  const group: Match = matchTransformer(match, homeTeam, awayTeam, homeManagers, awayManagers, goals, bookings);
+  const group: Match = matchTransformer(match, homeTeam, awayTeam, homeManagers, awayManagers, goals, bookings, substitutions);
 
   return ctx.json(group);
 })

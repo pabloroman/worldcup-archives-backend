@@ -5,6 +5,7 @@ import { Player } from "./player";
 import { Manager } from "./manager";
 import { Goal } from "./goal";
 import { Booking } from "./booking";
+import { Substitution } from "./substitution";
 
 export type RawMatch = {
     id: string;
@@ -67,6 +68,7 @@ export type Match = {
     away_managers: Array<Manager>,
     goals: Array<Goal>,
     bookings: Array<Booking>,
+    substitutions: Array<Substitution>,
 };
 
 export const MATCH_QUERY = `SELECT 
@@ -166,7 +168,27 @@ export const MATCH_BOOKINGS_QUERY = `SELECT
     INNER JOIN matches ON matches.match_id = bookings.match_id
     WHERE matches.key_id = ?`;
 
-export function matchTransformer(input: RawMatch, homeTeam: any, awayTeam: any, homeManagers: Manager[], awayManagers: Manager[], goals: Goal[], bookings: Booking[]): Match {
+export const MATCH_SUBSTITUTIONS_QUERY = `SELECT
+    players.given_name || ' ' || players.family_name as name,
+    substitutions.going_off, 
+    substitutions.coming_on, 
+    substitutions.minute_label as minute,
+    substitutions.home_team,
+    substitutions.away_team
+    FROM substitutions
+    INNER JOIN players ON players.player_id = substitutions.player_id
+    INNER JOIN matches ON matches.match_id = substitutions.match_id
+    WHERE matches.key_id = ?`;
+
+export function matchTransformer(
+    input: RawMatch, 
+    homeTeam: any, 
+    awayTeam: any, 
+    homeManagers: Manager[], 
+    awayManagers: Manager[], 
+    goals: Goal[], 
+    bookings: Booking[],
+    substitutions: Substitution[]): Match {
     
     return {
         id: input.id,
@@ -205,5 +227,6 @@ export function matchTransformer(input: RawMatch, homeTeam: any, awayTeam: any, 
         away_managers: awayManagers,
         goals: goals,
         bookings: bookings,
+        substitutions: substitutions,
     };
 }
