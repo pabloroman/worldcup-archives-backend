@@ -4,6 +4,7 @@ import { Referee } from "./referee";
 import { Player } from "./player";
 import { Manager } from "./manager";
 import { Goal } from "./goal";
+import { Booking } from "./booking";
 
 export type RawMatch = {
     id: string;
@@ -65,6 +66,7 @@ export type Match = {
     home_managers: Array<Manager>,
     away_managers: Array<Manager>,
     goals: Array<Goal>,
+    bookings: Array<Booking>,
 };
 
 export const MATCH_QUERY = `SELECT 
@@ -139,18 +141,32 @@ export const MATCH_AWAY_MANAGERS_QUERY = `SELECT
     WHERE matches.key_id = ?`;
 
 export const MATCH_GOALS_QUERY = `SELECT
+    players.given_name || ' ' || players.family_name as name,
     goals.penalty, 
     goals.minute_label as minute,
     goals.own_goal,
     goals.home_team,
-    goals.away_team,
-    players.given_name || ' ' || players.family_name as name
+    goals.away_team
     FROM goals
     INNER JOIN players ON players.player_id = goals.player_id
     INNER JOIN matches ON matches.match_id = goals.match_id
     WHERE matches.key_id = ?`;
 
-export function matchTransformer(input: RawMatch, homeTeam: any, awayTeam: any, homeManagers: Manager[], awayManagers: Manager[], goals: Goal[]): Match {
+export const MATCH_BOOKINGS_QUERY = `SELECT
+    players.given_name || ' ' || players.family_name as name,
+    bookings.yellow_card, 
+    bookings.red_card,
+    bookings.second_yellow_card, 
+    bookings.sending_off, 
+    bookings.minute_label as minute,
+    bookings.home_team,
+    bookings.away_team
+    FROM bookings
+    INNER JOIN players ON players.player_id = bookings.player_id
+    INNER JOIN matches ON matches.match_id = bookings.match_id
+    WHERE matches.key_id = ?`;
+
+export function matchTransformer(input: RawMatch, homeTeam: any, awayTeam: any, homeManagers: Manager[], awayManagers: Manager[], goals: Goal[], bookings: Booking[]): Match {
     
     return {
         id: input.id,
@@ -188,5 +204,6 @@ export function matchTransformer(input: RawMatch, homeTeam: any, awayTeam: any, 
         home_managers: homeManagers,
         away_managers: awayManagers,
         goals: goals,
+        bookings: bookings,
     };
 }
