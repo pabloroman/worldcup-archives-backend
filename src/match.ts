@@ -113,7 +113,30 @@ export const MATCH_HOME_TEAM_QUERY = `SELECT
     FROM matches 
     INNER JOIN player_appearances home_team_appearances ON matches.match_id = home_team_appearances.match_id AND home_team_appearances.team_id = matches.home_team_id
     INNER JOIN players home_team_players ON home_team_appearances.player_id = home_team_players.player_id
-    WHERE matches.key_id = ?`;
+    WHERE matches.key_id = ?
+    ORDER BY
+        starter=1 DESC,
+        position='GK' DESC,
+        position='CB' DESC,
+        position='LB' DESC,
+        position='RB' DESC,
+        position='LWB' DESC,
+        position='RWB' DESC,
+        position='SW' DESC,
+        position='DF' DESC,
+        position='DM' DESC,
+        position='CM' DESC,
+        position='AM' DESC,
+        position='LM' DESC,
+        position='RM' DESC,
+        position='MF' DESC,
+        position='CF' DESC,
+        position='FW' DESC,
+        position='LF' DESC,
+        position='RF' DESC,
+        position='LW' DESC,
+        position='RW' DESC,
+        position='SS' DESC`;
 
 export const MATCH_AWAY_TEAM_QUERY = `SELECT 
     away_team_appearances.shirt_number as number,
@@ -124,7 +147,30 @@ export const MATCH_AWAY_TEAM_QUERY = `SELECT
     FROM matches 
     INNER JOIN player_appearances away_team_appearances ON matches.match_id = away_team_appearances.match_id AND  away_team_appearances.team_id = matches.away_team_id
     INNER JOIN players away_team_players ON away_team_appearances.player_id = away_team_players.player_id
-    WHERE matches.key_id = ?`;
+    WHERE matches.key_id = ? 
+    ORDER BY
+        starter=1 DESC,
+        position='GK' DESC,
+        position='CB' DESC,
+        position='LB' DESC,
+        position='RB' DESC,
+        position='LWB' DESC,
+        position='RWB' DESC,
+        position='SW' DESC,
+        position='DF' DESC,
+        position='DM' DESC,
+        position='CM' DESC,
+        position='AM' DESC,
+        position='LM' DESC,
+        position='RM' DESC,
+        position='MF' DESC,
+        position='CF' DESC,
+        position='FW' DESC,
+        position='LF' DESC,
+        position='RF' DESC,
+        position='LW' DESC,
+        position='RW' DESC,
+        position='SS' DESC`;
 
 export const MATCH_HOME_MANAGERS_QUERY = `SELECT 
     managers.given_name || ' ' || managers.family_name as name,
