@@ -2,12 +2,14 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors';
 import { cache } from 'hono/cache';
 
-import { ALL_TOURNAMENTS_QUERY, SINGLE_TOURNAMENT_QUERY, Tournament, tournamentTransformer } from './tournaments';
+import { ALL_TOURNAMENTS_QUERY, SINGLE_TOURNAMENT_QUERY, Tournament, newTournamentTransformer, tournamentTransformer } from './tournaments';
 import { TOURNAMENT_TEAMS_QUERY } from './tournamentTeams';
 import { TOURNAMENT_MATCHES_QUERY, Match, matchesTransformer } from './tournamentMatches';
 import { MATCH_AWAY_MANAGERS_QUERY, MATCH_AWAY_TEAM_QUERY, MATCH_BOOKINGS_QUERY, MATCH_GOALS_QUERY, MATCH_HOME_MANAGERS_QUERY, MATCH_HOME_TEAM_QUERY, MATCH_QUERY, MATCH_SUBSTITUTIONS_QUERY, matchTransformer } from './match';
 import { SQUAD_MANAGERS_TOURNAMENT_QUERY, SQUAD_PLAYERS_TOURNAMENT_QUERY, SQUAD_TOURNAMENT_QUERY, Squad, squadTransformer } from './team';
 import { TEAM_MATCHES_QUERY, teamMatchesTransformer } from './teamMatches';
+import { TOURNAMENT_AWARDS_QUERY } from './tournamentAwards';
+import { TOURNAMENT_STANDINGS_QUERY } from './tournamentStandings';
 
 const app = new Hono()
 
@@ -29,11 +31,13 @@ app.get('/api/tournaments/:gender', async ctx => {
 
 app.get('/api/tournament/:id', async ctx => {
   const { id } = ctx.req.param();
-  const { results } = await ctx.env.DB.prepare(SINGLE_TOURNAMENT_QUERY).bind(id).all();
+  const tournament = await ctx.env.DB.prepare(SINGLE_TOURNAMENT_QUERY).bind(id).first();
+  const { results: awards } = await ctx.env.DB.prepare(TOURNAMENT_AWARDS_QUERY).bind(id).all();
+  const { results: standings } = await ctx.env.DB.prepare(TOURNAMENT_STANDINGS_QUERY).bind(id).all();
 
-  const group: Tournament[] = tournamentTransformer(results);
+  const group: Tournament = newTournamentTransformer(tournament, awards, standings);
 
-  return ctx.json(group[0]);
+  return ctx.json(group);
 })
 
 app.get('/api/tournament/:id/teams', async ctx => {

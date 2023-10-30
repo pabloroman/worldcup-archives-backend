@@ -1,4 +1,6 @@
 import { Team } from "./team";
+import { Award } from "./tournamentAwards";
+import { Standing } from "./tournamentStandings";
 
 export type RawTournament = {
     id: string,
@@ -25,11 +27,8 @@ export type Tournament = {
     end_date: string,
     count_teams: number,
     winner: Team,
-    awards: Array<{
-        player: string,
-        name: string,
-        team: Team,
-    }>,
+    awards: Array<Award>,
+    standings: Array<Standing>,
 };
 
 export const SINGLE_TOURNAMENT_QUERY = `SELECT 
@@ -94,18 +93,30 @@ export function tournamentTransformer(input: RawTournament[]): Tournament[] {
                     name: entry.winner_team_name,
                     code: entry.winner_team_code
                 },
-                awards: []
+                awards: [],
+                standings: [],
             };
         }
-        resultMap[entry.id].awards.push({
-            player: entry.player,
-            name: entry.award_name,
-            team: { 
-                name: entry.player_team_name,
-                code: entry.player_team_code
-            }
-        });
     });
 
     return Object.values(resultMap);
+};
+
+export function newTournamentTransformer(input: RawTournament, awards: Award[], standings: Standing[]): Tournament {
+    
+    return {
+        id: input.id,
+        name: input.name,
+        host_country: input.host_country,
+        year: input.year,
+        start_date: input.start_date,
+        end_date: input.end_date,
+        count_teams: input.count_teams,
+        winner: {
+            name: input.winner_team_name,
+            code: input.winner_team_code
+        },
+        awards: awards,
+        standings: standings,
+    };
 }
