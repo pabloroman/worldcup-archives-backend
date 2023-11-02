@@ -1,6 +1,7 @@
 import { Manager } from "./manager";
 import { Player } from "./player";
 import { MatchSummary } from "./teamMatches";
+import { Tournament } from "./tournaments";
 
 export type Team = {
     name: string,
@@ -12,7 +13,8 @@ export type Squad = {
     performance: string,
     managers: Array<Manager>,
     matches: Array<MatchSummary>,
-    players: Array<SquadMember>;
+    players: Array<SquadMember>,
+    tournament: Tournament,
 }
 
 export type SquadMember = {
@@ -49,7 +51,7 @@ export const SQUAD_MANAGERS_TOURNAMENT_QUERY = `SELECT
     WHERE manager_appointments.tournament_id = ?
     AND teams.team_code = ?`;
 
-export function squadTransformer(squad: any, players: SquadMember[], managers: Manager[], matches: MatchSummary[]): Squad {
+export function squadTransformer(squad: any, players: SquadMember[], managers: Manager[], matches: MatchSummary[], tournament: Tournament): Squad {
 
     return {
         country: {
@@ -60,5 +62,6 @@ export function squadTransformer(squad: any, players: SquadMember[], managers: M
         managers: managers,
         matches: matches,
         players: players,
+        tournament: tournament,
     };
 }

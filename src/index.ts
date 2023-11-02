@@ -16,7 +16,7 @@ const app = new Hono()
 app.use('/api/*', cors());
 
 app.get('/api/*', cache({
-  cacheName: 'worldcup-archives-2',
+  cacheName: 'worldcup-archives-3',
   cacheControl: 'public,max-age=2592000' // 30 days
 }));
 
@@ -47,15 +47,16 @@ app.get('/api/tournament/:id/teams', async ctx => {
   return ctx.json(results);
 })
 
-app.get('/api/tournament/:tournament/team/:team', async ctx => {
-  const { tournament, team } = ctx.req.param();
+app.get('/api/tournament/:id/team/:team', async ctx => {
+  const { id, team } = ctx.req.param();
   
-  const squad = await ctx.env.DB.prepare(SQUAD_TOURNAMENT_QUERY).bind(tournament, team).first();
-  const { results: players } = await ctx.env.DB.prepare(SQUAD_PLAYERS_TOURNAMENT_QUERY).bind(tournament, team).all();
-  const { results: managers } = await ctx.env.DB.prepare(SQUAD_MANAGERS_TOURNAMENT_QUERY).bind(tournament, team).all();
-  const { results: matches } = await ctx.env.DB.prepare(TEAM_MATCHES_QUERY).bind(tournament, team).all();
+  const squad = await ctx.env.DB.prepare(SQUAD_TOURNAMENT_QUERY).bind(id, team).first();
+  const { results: players } = await ctx.env.DB.prepare(SQUAD_PLAYERS_TOURNAMENT_QUERY).bind(id, team).all();
+  const { results: managers } = await ctx.env.DB.prepare(SQUAD_MANAGERS_TOURNAMENT_QUERY).bind(id, team).all();
+  const { results: matches } = await ctx.env.DB.prepare(TEAM_MATCHES_QUERY).bind(id, team).all();
+  const tournament = await ctx.env.DB.prepare(SINGLE_TOURNAMENT_QUERY).bind(id).first();
 
-  const group: Squad = squadTransformer(squad, players, managers, teamMatchesTransformer(matches));
+  const group: Squad = squadTransformer(squad, players, managers, teamMatchesTransformer(matches), newTournamentTransformer(tournament));
  
   return ctx.json(group);
 })

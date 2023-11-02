@@ -27,8 +27,8 @@ export type Tournament = {
     end_date: string,
     count_teams: number,
     winner: Team,
-    awards: Array<Award>,
-    standings: Array<Standing>,
+    awards?: Array<Award>,
+    standings?: Array<Standing>,
 };
 
 export const SINGLE_TOURNAMENT_QUERY = `SELECT 
@@ -102,7 +102,7 @@ export function tournamentTransformer(input: RawTournament[]): Tournament[] {
     return Object.values(resultMap);
 };
 
-export function newTournamentTransformer(input: RawTournament, awards: Award[], standings: Standing[]): Tournament {
+export function newTournamentTransformer(input: RawTournament, awards?: Award[], standings?: Standing[]): Tournament {
     
     return {
         id: input.id,
