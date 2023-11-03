@@ -2,7 +2,7 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors';
 import { cache } from 'hono/cache';
 
-import { ALL_TOURNAMENTS_QUERY, SINGLE_TOURNAMENT_QUERY, Tournament, newTournamentTransformer, tournamentTransformer } from './tournaments';
+import { ALL_TOURNAMENTS_QUERY, SINGLE_TOURNAMENT_QUERY, Tournament, singleTournamentTransformer, multipleTournamentTransformer } from './tournaments';
 import { TOURNAMENT_TEAMS_QUERY } from './tournamentTeams';
 import { TOURNAMENT_MATCHES_QUERY, Match, matchesTransformer } from './tournamentMatches';
 import { MATCH_AWAY_MANAGERS_QUERY, MATCH_AWAY_TEAM_QUERY, MATCH_BOOKINGS_QUERY, MATCH_GOALS_QUERY, MATCH_HOME_MANAGERS_QUERY, MATCH_HOME_TEAM_QUERY, MATCH_QUERY, MATCH_SUBSTITUTIONS_QUERY, matchTransformer } from './match';
@@ -24,7 +24,7 @@ app.get('/api/tournaments/:gender', async ctx => {
   const { gender } = ctx.req.param();
   const { results } = await ctx.env.DB.prepare(ALL_TOURNAMENTS_QUERY).bind(Number(gender == 'female')).all();
 
-  const group: Tournament[] = tournamentTransformer(results);
+  const group: Tournament[] = multipleTournamentTransformer(results);
 
   return ctx.json(group);
 })
@@ -35,7 +35,7 @@ app.get('/api/tournament/:id', async ctx => {
   const { results: awards } = await ctx.env.DB.prepare(TOURNAMENT_AWARDS_QUERY).bind(id).all();
   const { results: standings } = await ctx.env.DB.prepare(TOURNAMENT_STANDINGS_QUERY).bind(id).all();
 
-  const group: Tournament = newTournamentTransformer(tournament, awards, standings);
+  const group: Tournament = singleTournamentTransformer(tournament, awards, standings);
 
   return ctx.json(group);
 })
@@ -56,7 +56,7 @@ app.get('/api/tournament/:id/team/:team', async ctx => {
   const { results: matches } = await ctx.env.DB.prepare(TEAM_MATCHES_QUERY).bind(id, team).all();
   const tournament = await ctx.env.DB.prepare(SINGLE_TOURNAMENT_QUERY).bind(id).first();
 
-  const group: Squad = squadTransformer(squad, players, managers, teamMatchesTransformer(matches), newTournamentTransformer(tournament));
+  const group: Squad = squadTransformer(squad, players, managers, teamMatchesTransformer(matches), singleTournamentTransformer(tournament));
  
   return ctx.json(group);
 })

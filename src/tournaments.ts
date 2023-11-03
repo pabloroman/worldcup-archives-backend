@@ -76,7 +76,7 @@ export const ALL_TOURNAMENTS_QUERY = `SELECT
     WHERE tournaments.female = ?
     ORDER BY tournaments.year DESC`;
 
-export function tournamentTransformer(input: RawTournament[]): Tournament[] {
+export function multipleTournamentTransformer(input: RawTournament[]): Tournament[] {
     const resultMap: { [key: string]: Tournament } = {};
 
     input.forEach(entry => {
@@ -102,7 +102,7 @@ export function tournamentTransformer(input: RawTournament[]): Tournament[] {
     return Object.values(resultMap);
 };
 
-export function newTournamentTransformer(input: RawTournament, awards?: Award[], standings?: Standing[]): Tournament {
+export function singleTournamentTransformer(input: RawTournament, awards?: Award[], standings?: Standing[]): Tournament {
     
     return {
         id: input.id,
