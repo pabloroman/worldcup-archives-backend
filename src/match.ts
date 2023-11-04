@@ -8,22 +8,24 @@ import { Booking } from "./booking";
 import { Substitution } from "./substitution";
 
 export type RawMatch = {
-    id: string;
-    name: string;
-    stage_name: string;
-    tournament_name: string;
-    match_date: string;
-    match_time: string;
-    home_team_score: number;
-    away_team_score: number;
-    score: string;
-    score_penalties: string;
-    extra_time: boolean;
-    penalty_shootout: boolean;
-    home_team_code: string;
-    home_team_name: string;
-    away_team_code: string;
-    away_team_name: string;
+    id: string,
+    name: string,
+    stage_name: string,
+    tournament_name: string,
+    match_date: string,
+    match_time: string,
+    home_team_score: number,
+    away_team_score: number,
+    score: string,
+    score_penalties: string,
+    video: string,
+    image: string,
+    extra_time: boolean,
+    penalty_shootout: boolean,
+    home_team_code: string,
+    home_team_name: string,
+    away_team_code: string,
+    away_team_name: string,
     stadium_name: string,
     stadium_city: string,
     stadium_country: string,
@@ -34,21 +36,23 @@ export type RawMatch = {
 };
 
 export type Match = {
-    id: string;
-    name: string;
+    id: string,
+    name: string,
     tournament_name: string,
-    stage_name: string;
-    match_date: string;
-    match_time: string;
-    home_team_score: number;
-    away_team_score: number;
-    score: string;
-    score_penalties: string;
-    extra_time: boolean;
-    penalty_shootout: boolean;
-    home_team: Team;
-    away_team: Team;
-    stadium: Stadium;
+    stage_name: string,
+    match_date: string,
+    match_time: string,
+    home_team_score: number,
+    away_team_score: number,
+    score: string,
+    score_penalties: string,
+    video: string,
+    image: string,
+    extra_time: boolean,
+    penalty_shootout: boolean,
+    home_team: Team,
+    away_team: Team,
+    stadium: Stadium,
     referee: Referee,
     home_squad: Array<{
         player: Player,
@@ -84,6 +88,8 @@ export const MATCH_QUERY = `SELECT
     matches.penalty_shootout,
     matches.score,
     matches.score_penalties,
+    matches.video,
+    matches.image,
     home_team.team_code as home_team_code,
     home_team.team_name as home_team_name,
     away_team.team_code as away_team_code,
@@ -247,6 +253,8 @@ export function matchTransformer(
         away_team_score: input.away_team_score,
         score: input.score,
         score_penalties: input.score_penalties,
+        video: input.video,
+        image: input.image,
         extra_time: input.extra_time,
         penalty_shootout: input.penalty_shootout,
         home_team: {
