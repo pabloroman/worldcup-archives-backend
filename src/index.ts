@@ -16,7 +16,7 @@ const app = new Hono()
 app.use('/api/*', cors());
 
 app.get('/api/*', cache({
-  cacheName: 'worldcup-archives-3',
+  cacheName: 'worldcup-archives-4',
   cacheControl: 'public,max-age=2592000' // 30 days
 }));
 
