@@ -10,6 +10,7 @@ import { SQUAD_MANAGERS_TOURNAMENT_QUERY, SQUAD_PLAYERS_TOURNAMENT_QUERY, SQUAD_
 import { TEAM_MATCHES_QUERY, teamMatchesTransformer } from './teamMatches';
 import { TOURNAMENT_AWARDS_QUERY } from './tournamentAwards';
 import { TOURNAMENT_STANDINGS_QUERY } from './tournamentStandings';
+import { TOURNAMENT_STADIUMS_QUERY } from './tournamentStadiums';
 
 const app = new Hono()
 
@@ -34,8 +35,9 @@ app.get('/api/tournament/:id', async ctx => {
   const tournament = await ctx.env.DB.prepare(SINGLE_TOURNAMENT_QUERY).bind(id).first();
   const { results: awards } = await ctx.env.DB.prepare(TOURNAMENT_AWARDS_QUERY).bind(id).all();
   const { results: standings } = await ctx.env.DB.prepare(TOURNAMENT_STANDINGS_QUERY).bind(id).all();
+  const { results: stadiums } = await ctx.env.DB.prepare(TOURNAMENT_STADIUMS_QUERY).bind(id).all();
 
-  const group: Tournament = singleTournamentTransformer(tournament, awards, standings);
+  const group: Tournament = singleTournamentTransformer(tournament, awards, standings, stadiums);
 
   return ctx.json(group);
 })
