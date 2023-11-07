@@ -4,8 +4,8 @@ import { cache } from 'hono/cache';
 
 import { ALL_TOURNAMENTS_QUERY, SINGLE_TOURNAMENT_QUERY, Tournament, singleTournamentTransformer, multipleTournamentTransformer } from './tournaments';
 import { TOURNAMENT_TEAMS_QUERY } from './tournamentTeams';
-import { TOURNAMENT_MATCHES_QUERY, Match, matchesTransformer } from './tournamentMatches';
-import { MATCH_AWAY_MANAGERS_QUERY, MATCH_AWAY_TEAM_QUERY, MATCH_BOOKINGS_QUERY, MATCH_GOALS_QUERY, MATCH_HOME_MANAGERS_QUERY, MATCH_HOME_TEAM_QUERY, MATCH_QUERY, MATCH_SUBSTITUTIONS_QUERY, matchTransformer } from './match';
+import { TOURNAMENT_MATCHES_QUERY, SimpleMatch, matchesTransformer } from './tournamentMatches';
+import { MATCH_AWAY_MANAGERS_QUERY, MATCH_AWAY_TEAM_QUERY, MATCH_BOOKINGS_QUERY, MATCH_GOALS_QUERY, MATCH_HOME_MANAGERS_QUERY, MATCH_HOME_TEAM_QUERY, MATCH_QUERY, MATCH_SUBSTITUTIONS_QUERY, Match, SIMILAR_MATCHES_QUERY, matchTransformer } from './match';
 import { SQUAD_MANAGERS_TOURNAMENT_QUERY, SQUAD_PLAYERS_TOURNAMENT_QUERY, SQUAD_TOURNAMENT_QUERY, Squad, squadTransformer } from './team';
 import { TEAM_MATCHES_QUERY, teamMatchesTransformer } from './teamMatches';
 import { TOURNAMENT_AWARDS_QUERY } from './tournamentAwards';
@@ -69,7 +69,7 @@ app.get('/api/tournament/:id/games', async ctx => {
   const { id } = ctx.req.param();
   const { results } = await ctx.env.DB.prepare(TOURNAMENT_MATCHES_QUERY).bind(id).all();
 
-  const group: Match[] = matchesTransformer(results);
+  const group: SimpleMatch[] = matchesTransformer(results);
 
   return ctx.json(group);
 })
@@ -88,7 +88,9 @@ app.get('/api/game/:id', async ctx => {
   const { results: bookings } = await ctx.env.DB.prepare(MATCH_BOOKINGS_QUERY).bind(id).all();
   const { results: substitutions } = await ctx.env.DB.prepare(MATCH_SUBSTITUTIONS_QUERY).bind(id).all();
 
-  const group: Match = matchTransformer(match, homeTeam, awayTeam, homeManagers, awayManagers, goals, bookings, substitutions);
+  const { results: similarGames } = await ctx.env.DB.prepare(SIMILAR_MATCHES_QUERY).bind(match.home_team_id, match.away_team_id, id).all()
+
+  const group: Match = matchTransformer(match, homeTeam, awayTeam, homeManagers, awayManagers, goals, bookings, substitutions, similarGames);
 
   return ctx.json(group);
 })

@@ -6,6 +6,7 @@ import { Manager } from "./manager";
 import { Goal } from "./goal";
 import { Booking } from "./booking";
 import { Substitution } from "./substitution";
+import { SimpleMatch } from "./tournamentMatches";
 
 export type RawMatch = {
     id: string,
@@ -22,8 +23,10 @@ export type RawMatch = {
     image: string,
     extra_time: boolean,
     penalty_shootout: boolean,
+    home_team_id: string,
     home_team_code: string,
     home_team_name: string,
+    away_team_id: string,
     away_team_code: string,
     away_team_name: string,
     stadium_name: string,
@@ -73,6 +76,7 @@ export type Match = {
     goals: Array<Goal>,
     bookings: Array<Booking>,
     substitutions: Array<Substitution>,
+    similar_games: Array<SimpleMatch>,
 };
 
 export const MATCH_QUERY = `SELECT 
@@ -90,6 +94,8 @@ export const MATCH_QUERY = `SELECT
     matches.score_penalties,
     matches.video,
     matches.image,
+    matches.home_team_id,
+    matches.away_team_id,
     home_team.team_code as home_team_code,
     home_team.team_name as home_team_name,
     away_team.team_code as away_team_code,
@@ -232,6 +238,33 @@ export const MATCH_SUBSTITUTIONS_QUERY = `SELECT
     INNER JOIN matches ON matches.match_id = substitutions.match_id
     WHERE matches.key_id = ?`;
 
+export const SIMILAR_MATCHES_QUERY = `SELECT 
+    matches.key_id as id,
+    matches.match_name as name,
+    matches.stage_name,
+    matches.match_date,
+    matches.match_time,
+    matches.extra_time,
+    matches.home_team_score,
+    matches.away_team_score,
+    matches.penalty_shootout,
+    matches.score,
+    matches.score_penalties,
+    home_team.team_code as home_team_code,
+    home_team.team_name as home_team_name,
+    away_team.team_code as away_team_code,
+    away_team.team_name as away_team_name,
+    tournaments.tournament_name,
+    tournaments.tournament_id
+    FROM matches 
+    INNER JOIN tournaments ON tournaments.tournament_id = matches.tournament_id
+    INNER JOIN teams home_team ON matches.home_team_id = home_team.team_id
+    INNER JOIN teams away_team ON matches.away_team_id = away_team.team_id
+    WHERE (
+        (matches.home_team_id = ?1 AND matches.away_team_id = ?2) 
+        OR (matches.home_team_id = ?2 AND matches.away_team_id = ?1)
+    ) AND matches.key_id != ?3`;
+
 export function matchTransformer(
     input: RawMatch, 
     homeTeam: any, 
@@ -240,7 +273,9 @@ export function matchTransformer(
     awayManagers: Manager[], 
     goals: Goal[], 
     bookings: Booking[],
-    substitutions: Substitution[]): Match {
+    substitutions: Substitution[],
+    similarGames: SimpleMatch[],
+    ): Match {
     
     return {
         id: input.id,
@@ -282,5 +317,6 @@ export function matchTransformer(
         goals: goals,
         bookings: bookings,
         substitutions: substitutions,
+        similar_games: similarGames,
     };
 }
