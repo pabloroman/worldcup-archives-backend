@@ -1,5 +1,6 @@
 import { Stadium } from "./stadium";
 import { Team } from "./team";
+import { TopScorer } from "./topScorer";
 import { Award } from "./tournamentAwards";
 import { Standing } from "./tournamentStandings";
 
@@ -33,6 +34,7 @@ export type Tournament = {
     awards?: Array<Award>,
     standings?: Array<Standing>,
     stadiums?: Array<Stadium>,
+    topScorers?: Array<TopScorer>,
 };
 
 export const SINGLE_TOURNAMENT_QUERY = `SELECT 
@@ -110,7 +112,12 @@ export function multipleTournamentTransformer(input: RawTournament[]): Tournamen
     return Object.values(resultMap);
 };
 
-export function singleTournamentTransformer(input: RawTournament, awards?: Award[], standings?: Standing[], stadiums?: Stadium[]): Tournament {
+export function singleTournamentTransformer(
+    input: RawTournament, 
+    awards?: Award[], 
+    standings?: Standing[], 
+    stadiums?: Stadium[],
+    topScorers?: TopScorer[]): Tournament {
     
     return {
         id: input.id,
@@ -128,5 +135,6 @@ export function singleTournamentTransformer(input: RawTournament, awards?: Award
         awards: awards,
         standings: standings,
         stadiums: stadiums,
+        topScorers: topScorers,
     };
 }

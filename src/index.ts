@@ -11,13 +11,14 @@ import { TEAM_MATCHES_QUERY, teamMatchesTransformer } from './teamMatches';
 import { TOURNAMENT_AWARDS_QUERY } from './tournamentAwards';
 import { TOURNAMENT_STANDINGS_QUERY } from './tournamentStandings';
 import { TOURNAMENT_STADIUMS_QUERY } from './tournamentStadiums';
+import { TOURNAMENT_TOP_SCORERS_QUERY } from './topScorer';
 
 const app = new Hono()
 
 app.use('/api/*', cors());
 
 app.get('/api/*', cache({
-  cacheName: 'worldcup-archives-5',
+  cacheName: 'worldcup-archives-6',
   cacheControl: 'public,max-age=2592000' // 30 days
 }));
 
@@ -36,8 +37,9 @@ app.get('/api/tournament/:id', async ctx => {
   const { results: awards } = await ctx.env.DB.prepare(TOURNAMENT_AWARDS_QUERY).bind(id).all();
   const { results: standings } = await ctx.env.DB.prepare(TOURNAMENT_STANDINGS_QUERY).bind(id).all();
   const { results: stadiums } = await ctx.env.DB.prepare(TOURNAMENT_STADIUMS_QUERY).bind(id).all();
+  const { results: topScorers } = await ctx.env.DB.prepare(TOURNAMENT_TOP_SCORERS_QUERY).bind(id).all();
 
-  const group: Tournament = singleTournamentTransformer(tournament, awards, standings, stadiums);
+  const group: Tournament = singleTournamentTransformer(tournament, awards, standings, stadiums, topScorers);
 
   return ctx.json(group);
 })
