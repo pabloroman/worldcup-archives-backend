@@ -34,7 +34,7 @@ export type Tournament = {
     awards?: Array<Award>,
     standings?: Array<Standing>,
     stadiums?: Array<Stadium>,
-    topScorers?: Array<TopScorer>,
+    top_scorers?: Array<TopScorer>,
 };
 
 export const SINGLE_TOURNAMENT_QUERY = `SELECT 
@@ -135,6 +135,6 @@ export function singleTournamentTransformer(
         awards: awards,
         standings: standings,
         stadiums: stadiums,
-        topScorers: topScorers,
+        top_scorers: topScorers,
     };
 }
