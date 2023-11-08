@@ -90,7 +90,7 @@ app.get('/api/game/:id', async ctx => {
 
   const { results: similarGames } = await ctx.env.DB.prepare(SIMILAR_MATCHES_QUERY).bind(match.home_team_id, match.away_team_id, id).all()
 
-  const group: Match = matchTransformer(match, homeTeam, awayTeam, homeManagers, awayManagers, goals, bookings, substitutions, similarGames);
+  const group: Match = matchTransformer(match, homeTeam, awayTeam, homeManagers, awayManagers, goals, bookings, substitutions, matchesTransformer(similarGames));
 
   return ctx.json(group);
 })
