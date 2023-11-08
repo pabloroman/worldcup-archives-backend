@@ -12,6 +12,7 @@ import { TOURNAMENT_AWARDS_QUERY } from './tournamentAwards';
 import { TOURNAMENT_STANDINGS_QUERY } from './tournamentStandings';
 import { TOURNAMENT_STADIUMS_QUERY } from './tournamentStadiums';
 import { TOURNAMENT_TOP_SCORERS_QUERY } from './topScorer';
+import { Stage, TOURNAMENT_GROUPS_QUERY, groupsTransformer } from './tournamentGroup';
 
 const app = new Hono()
 
@@ -72,6 +73,15 @@ app.get('/api/tournament/:id/games', async ctx => {
   const group: SimpleMatch[] = matchesTransformer(results);
 
   return ctx.json(group);
+})
+
+app.get('/api/tournament/:id/groups', async ctx => {
+  const { id } = ctx.req.param();
+  const { results } = await ctx.env.DB.prepare(TOURNAMENT_GROUPS_QUERY).bind(id).all();
+
+  const stages: Stage[] = groupsTransformer(results);
+
+  return ctx.json(stages);
 })
 
 app.get('/api/game/:id', async ctx => {
