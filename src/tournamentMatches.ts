@@ -66,7 +66,8 @@ export const TOURNAMENT_MATCHES_QUERY = `SELECT
     INNER JOIN tournaments ON tournaments.tournament_id = matches.tournament_id
     INNER JOIN teams home_team ON matches.home_team_id = home_team.team_id
     INNER JOIN teams away_team ON matches.away_team_id = away_team.team_id
-    WHERE matches.tournament_id = ?`;
+    WHERE matches.tournament_id = ?
+    ORDER BY match_date DESC`;
 
 
 export function matchesTransformer(input: RawSimpleMatch[]): SimpleMatch[] {
