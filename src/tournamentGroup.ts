@@ -62,7 +62,8 @@ export const TOURNAMENT_GROUPS_QUERY = `SELECT
     teams.team_code
     FROM group_standings 
     INNER JOIN teams ON teams.team_id = group_standings.team_id
-    WHERE group_standings.tournament_id = ?`
+    WHERE group_standings.tournament_id = ?
+    ORDER BY stage_number DESC, group_name ASC, position ASC`
 
 export function groupsTransformer(input: RawGroup[]): Stage[] {
 
@@ -85,27 +86,27 @@ export function groupsTransformer(input: RawGroup[]): Stage[] {
             team_code: entry.team_code,
         }
 
-        if (!groupMap[`${entry.stage_number}${entry.group_name}`]) {
-            groupMap[`${entry.stage_number}${entry.group_name}`] = {
+        if (!groupMap[`${entry.stage_name}${entry.group_name}`]) {
+            groupMap[`${entry.stage_name}${entry.group_name}`] = {
                 stage_number: entry.stage_number,
                 stage_name: entry.stage_name,
                 name: entry.group_name,
                 groupStandings: []
             }
         }
-        groupMap[`${entry.stage_number}${entry.group_name}`].groupStandings.push(groupStanding)
+        groupMap[`${entry.stage_name}${entry.group_name}`].groupStandings.push(groupStanding)
     });
 
     const stageMap: { [key: string]: Stage } = {};
     Object.values(groupMap).forEach(entry => {
-        if (!stageMap[entry.stage_number]) {
-            stageMap[entry.stage_number] = {
+        if (!stageMap[entry.stage_name]) {
+            stageMap[entry.stage_name] = {
                 number: entry.stage_number,
                 name: entry.stage_name,
                 groups: []
             }
         }
-        stageMap[entry.stage_number].groups.push(entry)
+        stageMap[entry.stage_name].groups.push(entry)
     })
 
     return Object.values(stageMap);
