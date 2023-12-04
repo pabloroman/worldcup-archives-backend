@@ -8,6 +8,8 @@ export type RawMatch = {
     match_time: string;
     home_team_score: number;
     away_team_score: number;
+    home_team_score_penalties: number,
+    away_team_score_penalties: number,
     score: string;
     score_penalties: string;
     extra_time: boolean;
@@ -26,6 +28,8 @@ export type MatchSummary = {
     match_time: string;
     home_team_score: number;
     away_team_score: number;
+    home_team_score_penalties: number,
+    away_team_score_penalties: number,
     score: string;
     score_penalties: string;
     extra_time: boolean;
@@ -43,6 +47,8 @@ export const TEAM_MATCHES_QUERY = `SELECT
     matches.extra_time,
     matches.home_team_score,
     matches.away_team_score,
+    matches.home_team_score_penalties,
+    matches.away_team_score_penalties,
     matches.penalty_shootout,
     matches.score,
     matches.score_penalties,
@@ -72,6 +78,8 @@ export function teamMatchesTransformer(input: RawMatch[]): MatchSummary[] {
                 match_time: entry.match_time,
                 home_team_score: entry.home_team_score,
                 away_team_score: entry.away_team_score,
+                home_team_score_penalties: entry.home_team_score_penalties,
+                away_team_score_penalties: entry.away_team_score_penalties,
                 score: entry.score,
                 score_penalties: entry.score_penalties,
                 extra_time: entry.extra_time,
