@@ -250,6 +250,8 @@ export const SIMILAR_MATCHES_QUERY = `SELECT
     matches.extra_time,
     matches.home_team_score,
     matches.away_team_score,
+    matches.home_team_score_penalties,
+    matches.away_team_score_penalties,
     matches.penalty_shootout,
     matches.score,
     matches.score_penalties,
