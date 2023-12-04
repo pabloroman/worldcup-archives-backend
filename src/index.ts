@@ -98,7 +98,7 @@ app.get('/api/game/:id', async ctx => {
   const { results: bookings } = await ctx.env.DB.prepare(MATCH_BOOKINGS_QUERY).bind(id).all();
   const { results: substitutions } = await ctx.env.DB.prepare(MATCH_SUBSTITUTIONS_QUERY).bind(id).all();
 
-  const { results: similarGames } = await ctx.env.DB.prepare(SIMILAR_MATCHES_QUERY).bind(match.home_team_id, match.away_team_id, id).all()
+  const { results: similarGames } = await ctx.env.DB.prepare(SIMILAR_MATCHES_QUERY).bind(match.home_team_id, match.away_team_id, id, match.tournament_gender == 'female' ? 1 : 0).all()
 
   const group: Match = matchTransformer(match, homeTeam, awayTeam, homeManagers, awayManagers, goals, bookings, substitutions, matchesTransformer(similarGames));
 

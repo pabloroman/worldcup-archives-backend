@@ -42,6 +42,7 @@ export type Match = {
     id: string,
     name: string,
     tournament_name: string,
+    tournament_gender: string,
     stage_name: string,
     match_date: string,
     match_time: string,
@@ -84,6 +85,8 @@ export const MATCH_QUERY = `SELECT
     matches.match_name as name,
     matches.stage_name,
     tournaments.tournament_name as tournament_name,
+    CASE WHEN tournaments.female = 0 THEN 'male'
+    WHEN tournaments.female = 1 THEN 'female' END AS tournament_gender,
     matches.match_date,
     matches.match_time,
     matches.extra_time,
@@ -263,7 +266,8 @@ export const SIMILAR_MATCHES_QUERY = `SELECT
     WHERE (
         (matches.home_team_id = ?1 AND matches.away_team_id = ?2) 
         OR (matches.home_team_id = ?2 AND matches.away_team_id = ?1)
-    ) AND matches.key_id != ?3`;
+    ) AND matches.key_id != ?3
+    AND tournaments.female = ?4`;
 
 export function matchTransformer(
     input: RawMatch, 
