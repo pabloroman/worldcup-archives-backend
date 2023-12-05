@@ -26,12 +26,16 @@ export type SquadMember = {
 export const SQUAD_PLAYERS_TOURNAMENT_QUERY = `SELECT 
     squad_members.shirt_number,
     squad_members.position_code as position,
-    players.given_name || ' ' || players.family_name as player
+    players.given_name || ' ' || players.family_name as player,
+    COUNT(goals.key_id) as goal_count
     FROM squad_members
     INNER JOIN teams ON teams.team_id = squad_members.team_id
     INNER JOIN players ON players.player_id = squad_members.player_id
-    WHERE squad_members.tournament_id = ? 
-    AND teams.team_code = ? ORDER BY shirt_number`;
+    LEFT JOIN goals ON goals.player_id = squad_members.player_id AND goals.tournament_id = ?1 AND goals.own_goal = 0
+    WHERE squad_members.tournament_id = ?1 
+    AND teams.team_code = ?2
+    GROUP BY squad_members.player_id
+    ORDER BY squad_members.shirt_number`;
 
 export const SQUAD_TOURNAMENT_QUERY = `SELECT
     qualified_teams.performance,
